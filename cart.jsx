@@ -102,13 +102,23 @@ const Products = (props) => {
   const addToCart = (e) => {
     let name = e.target.name;
     let item = items.filter((item) => item.name == name);
+    if (item[0].instock == 0) return;
+    item[0].instock =item[0].instock -1;
     console.log(`add to Cart ${JSON.stringify(item)}`);
     setCart([...cart, ...item]);
     //doFetch(query);
   };
-  const deleteCartItem = (index) => {
-    let newCart = cart.filter((item, i) => index != i);
+  const deleteCartItem = (delIndex) => {
+    //this is the index in the cart not in the Product list
+
+    let newCart = cart.filter((item, i) => delIndex != i);
+    let target = cart.filter((item, index) => delIndex==index);
+    let newItems = items.map((item, index) => {
+      if (item.name == target[0].name) item.instock = item.instock +1;
+      return item;
+    })
     setCart(newCart);
+    setItems(newItems);
   };
   const photos = ["1011-50x50.jpg", "1015-50x50.jpg", "1016-50x50.jpg", "1049-50x50.jpg"];
 
@@ -120,7 +130,7 @@ const Products = (props) => {
       <li key={index}>
         <Image src={photos[index % 4]} width={70} roundedCircle></Image>
         <Button variant="primary" size="large">
-          {item.name}:{item.cost}
+          {item.name}:${item.cost}-Stock={item.instock}
         </Button>
         <input name={item.name} type="submit" onClick={addToCart}></input>
       </li>
